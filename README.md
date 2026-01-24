@@ -107,6 +107,11 @@ BlockChainSD/
 │   └── index.html       # Frontend moderno com TailwindCSS
 ├── static/
 │   └── styles.css       # Estilos customizados
+├── docs/
+│   ├── apresentacao.md          # Guia completo de apresentação
+│   ├── explicacao_sincronizacao.md  # Explicação técnica da sincronização
+│   ├── project_context.md       # Requisitos do trabalho
+│   └── developer_context.md     # Contexto de desenvolvimento
 └── README.md            # Este arquivo
 ```
 

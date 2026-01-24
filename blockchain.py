@@ -6,12 +6,13 @@ from typing import List, Dict, Any, Optional
 
 
 class Transaction:
-    def __init__(self, text: str, tx_type: str = "TX", tx_id: str = None, 
-                 replaces: str = None, origin_node: str = None):
+    def __init__(self, text: str, tx_type: str = "TX", tx_id: str = None,
+                 replaces: str = None, origin_node: str = None,
+                 timestamp: int = None):
         self.id = tx_id or str(uuid.uuid4())
         self.type = tx_type  # TX, UPDATE, ROOT
         self.text = text
-        self.timestamp = int(time.time())
+        self.timestamp = timestamp if timestamp is not None else int(time.time())
         self.replaces = replaces
         self.origin_node = origin_node or "unknown"
     
@@ -30,17 +31,18 @@ class Transaction:
         return cls(
             text=data["text"],
             tx_type=data["type"],
-            tx_id=data["id"],
+            tx_id=data.get("id"),  # ← CORRIGIDO: usar "id" do JSON
             replaces=data.get("replaces"),
-            origin_node=data.get("origin_node")
+            origin_node=data.get("origin_node"),
+            timestamp=data.get("timestamp")
         )
 
 
 class Block:
     def __init__(self, index: int, transactions: List[Transaction], 
-                 proof: int, previous_hash: str):
+                 proof: int, previous_hash: str, timestamp: int = None):
         self.index = index
-        self.timestamp = int(time.time())
+        self.timestamp = timestamp if timestamp is not None else int(time.time())
         self.transactions = transactions
         self.proof = proof
         self.previous_hash = previous_hash
@@ -61,7 +63,8 @@ class Block:
             index=data["index"],
             transactions=transactions,
             proof=data["proof"],
-            previous_hash=data["previous_hash"]
+            previous_hash=data["previous_hash"],
+            timestamp=data.get("timestamp")  # ← Adicionar timestamp
         )
     
     def compute_hash(self) -> str:
@@ -77,17 +80,20 @@ class Blockchain:
         self.create_genesis_block()
     
     def create_genesis_block(self):
+        genesis_timestamp = 0
         root_tx = Transaction(
             text="ROOT: rede inicializada",
             tx_type="ROOT",
             tx_id="root",
-            origin_node=self.node_id
+            origin_node="genesis",  # FIXADO para todos os nos
+            timestamp=genesis_timestamp
         )
         genesis_block = Block(
             index=1,
             transactions=[root_tx],
             proof=100,
-            previous_hash="0"
+            previous_hash="0",
+            timestamp=genesis_timestamp
         )
         self.chain.append(genesis_block)
     
